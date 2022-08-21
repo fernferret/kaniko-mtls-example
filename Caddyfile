@@ -1,0 +1,20 @@
+{
+	https_port {$REG_EXT_PORT}
+	auto_https disable_certs
+	skip_install_trust
+	debug
+}
+
+{$REGISTRY} {
+	log
+	reverse_proxy /v2/* 127.0.0.1:{$REG_INT_PORT} {
+		header_up X-Forwarded-Proto "https"
+	}
+
+	tls ./certs/server.pem ./certs/server.key {
+		client_auth {
+			mode require_and_verify
+			trusted_ca_cert_file ./certs/ca.pem
+		}
+	}
+}
